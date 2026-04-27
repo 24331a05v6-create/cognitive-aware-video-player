@@ -14,5 +14,11 @@ An AI-powered adaptive video learning system that adjusts playback based on user
 - Python (Flask)
 - OpenCV
 - JavaScript / HTML / CSS
+## ⚙️ Installation
 
+```bash
+git clone https://github.com/24331a05v6-create/cognitive-aware-video-player.git
+cd cognitive-aware-video-player
+pip install -r requirements.txt
+python app.py
 
