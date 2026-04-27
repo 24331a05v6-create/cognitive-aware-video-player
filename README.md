@@ -15,13 +15,4 @@ An AI-powered adaptive video learning system that adjusts playback based on user
 - OpenCV
 - JavaScript / HTML / CSS
 
-## 📷 Demo
-(Add screenshots or screen recording here)
 
-## ⚙️ Installation
-
-```bash
-git clone https://github.com/yourusername/project-name
-cd project-name
-pip install -r requirements.txt
-python app.py
