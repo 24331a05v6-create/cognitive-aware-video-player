@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset Password</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="card-bg">
+
+<div class="card">
+    <h2>Reset Password</h2>
+
+    <input type="email" id="email" placeholder="Enter your email"><br><br>
+    <button onclick="sendOtp()">Send OTP</button><br><br>
+
+    <input type="text" id="otp" placeholder="Enter OTP"><br><br>
+    <input type="password" id="new_password" placeholder="New Password"><br><br>
+
+    <button onclick="resetPassword()">Reset Password</button>
+
+    <p id="result"></p>
+    <a href="/login">Back to Login</a>
+</div>
+
+<script>
+function sendOtp() {
+    const email = document.getElementById("email").value;
+
+    fetch("http://192.168.1.4:3000/api/send-reset-otp", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ email })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerText = data.message;
+    });
+}
+
+function resetPassword() {
+    const email = document.getElementById("email").value;
+    const otp = document.getElementById("otp").value;
+    const new_password = document.getElementById("new_password").value;
+
+    fetch("http://192.168.1.4:3000/api/reset-password", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ email, otp, new_password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").innerText = data.message;
+
+        if (data.message.includes("successful")) {
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1000);
+        }
+    });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <button class="new-chat">+ New Chat</button>
+        </div>
+        <div class="chat-history">
+            <div class="chat-item active">Chat 1</div>
+            <div class="chat-item">Chat 2</div>
+        </div>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="main">
+        <div class="topbar">
+            🤖 AI Assistant
+        </div>
+
+        <div id="chatBox" class="chat-area">
+            <div class="msg ai">
+                Hello! I’m your AI assistant.
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input id="userInput" type="text" placeholder="Message AI..."
+                   onkeypress="handleKey(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
+<script>
+function goBack() {
+    window.location.href = "/dashboard";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Learn</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        .welcome-container {
+            text-align: center;
+        }
+
+        .portal-name {
+    font-size: 60px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #ff6a00, #ff00cc, #00c6ff);
+
+    background-clip: text;           /* standard */
+    -webkit-background-clip: text;   /* for Chrome/Safari */
+
+    color: transparent;              /* standard */
+    -webkit-text-fill-color: transparent;
+}
+
+        .tagline {
+            font-size: 20px;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .welcome-btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #ff6a00, #ff00cc);
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .welcome-btn:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="card-bg">
+
+<div class="welcome-container">
+    <div class="portal-name">Live Learn</div>
+    <div class="tagline">Welcome to your learning portal</div>
+
+    <button class="welcome-btn" onclick="goToLogin()">
+        Welcome
+    </button>
+</div>
+
+<script>
+function goToLogin() {
+    window.location.href = "/login";
+}
+</script>
+
+</body>
+</html>

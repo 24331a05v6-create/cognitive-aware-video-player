@@ -1,0 +1,342 @@
+/* ============================= */
+/* GLOBAL RESET */
+/* ============================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* ============================= */
+/* BODY BACKGROUNDS */
+/* ============================= */
+
+/* Default AI background */
+body {
+    height: 100vh;
+    background: #0f172a;
+}
+
+/* Login / card pages override */
+.card-page body,
+body.card-bg {
+    min-height: 100vh;
+    background: linear-gradient(to right, #36d1dc, #5b86e5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ============================= */
+/* LOGIN / SIGNUP CARD */
+/* ============================= */
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    text-align: left;
+}
+
+.card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid #aaa;
+    font-size: 14px;
+}
+
+.card button {
+    padding: 12px 20px;
+    background: #4da3ff;
+    border: none;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.card button:hover {
+    background: #2e86de;
+}
+
+.card a {
+    color: #2e86de;
+    text-decoration: none;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+.card p {
+    margin-top: 10px;
+}
+
+/* ============================= */
+/* DASHBOARD ELEMENTS */
+/* ============================= */
+.status-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: lime;
+    text-align: center;
+    min-width: 180px;
+}
+
+.webcam-box {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 180px;
+    height: 130px;
+    background: black;
+    border-radius: 8px;
+    overflow: hidden;
+    z-index: 10;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+.webcam-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: limegreen;
+    transition: width 0.3s;
+}
+
+/* ============================= */
+/* AI CHAT LAYOUT */
+/* ============================= */
+.app {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background: #020617;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #1e293b;
+}
+
+.sidebar-header {
+    padding: 15px;
+    border-bottom: 1px solid #1e293b;
+}
+
+.new-chat {
+    width: 100%;
+    padding: 10px;
+    background: #0ea5e9;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.chat-history {
+    padding: 10px;
+}
+
+.chat-item {
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    cursor: pointer;
+}
+
+.chat-item:hover {
+    background: #1e293b;
+}
+
+.chat-item.active {
+    background: #0ea5e9;
+}
+
+/* Main Chat */
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0f172a;
+}
+
+/* Top bar */
+.topbar {
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    background: #020617;
+    border-bottom: 1px solid #1e293b;
+    color: white;
+}
+
+/* Chat area */
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Messages */
+.msg {
+    max-width: 700px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 16px;
+}
+
+.ai {
+    background: #1e293b;
+    color: #e2e8f0;
+    align-self: flex-start;
+}
+
+.user {
+    background: #111827;
+    color: #e5e7eb;
+    align-self: flex-end;
+}
+
+/* Input */
+.input-area {
+    display: flex;
+    padding: 15px 20px;
+    border-top: 1px solid #1e293b;
+    background: #020617;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    outline: none;
+}
+
+.input-area button {
+    margin-left: 10px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    background: #0ea5e9;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.input-area button:hover {
+    background: #0284c7;
+}
+
+/* ============================= */
+/* MARKDOWN STYLING */
+/* ============================= */
+.msg.ai h1,
+.msg.ai h2,
+.msg.ai h3 {
+    margin: 10px 0;
+}
+
+.msg.ai ul {
+    margin-left: 20px;
+}
+
+.msg.ai code {
+    background: #020617;
+    padding: 3px 6px;
+    border-radius: 5px;
+    color: #38bdf8;
+}
+
+.msg.ai pre {
+    background: #020617;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+/* ============================= */
+/* TYPING INDICATOR */
+/* ============================= */
+.typing {
+    display: flex;
+    gap: 6px;
+    width: fit-content;
+}
+
+.typing span {
+    width: 8px;
+    height: 8px;
+    background: #94a3b8;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.typing span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+/* Back button (AI page) */
+.back-btn {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 16px;
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.back-btn:hover {
+    background: #0284c7;
+}

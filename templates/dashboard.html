@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+       body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #36d1dc, #5b86e5, #ff00cc);
+    height: 100vh;
+}
+
+/* Top bar */
+.top-bar {
+    height: 80px;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: white;
+    z-index: 10;
+    position: relative;
+}
+
+
+/* Webcam */
+.webcam-box {
+    width: 120px;
+    height: 70px;
+    background: black;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.webcam-box video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Status text */
+.status-text {
+    font-size: 18px;
+    text-align: center;
+}
+
+/* Logout */
+.logout-btn {
+    padding: 8px 16px;
+    border: none;
+    background: crimson;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Video section */
+.video-section {
+    height: calc(100vh - 80px);
+    padding: 15px;
+    box-sizing: border-box;
+}
+
+.video-section iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 10px;
+}
+
+/* Floating input */
+.input-bar {
+    position: fixed;
+    top: 90px;   /* moved below top bar */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+.input-bar input {
+    padding: 8px;
+    width: 300px;
+    border-radius: 6px;
+    border: none;
+}
+
+.input-bar button {
+    padding: 8px 16px;
+    margin-left: 6px;
+    border: none;
+    background: #4da3ff;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+
+    <div class="webcam-box">
+        <video id="webcam" autoplay muted></video>
+    </div>
+
+    <div class="status-text" id="statusText">
+        Status: Detecting...
+    </div>
+
+    <button class="logout-btn" onclick="logout()">Logout</button>
+
+</div>
+
+<!-- Video area -->
+<div class="video-section">
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</div>
+
+<!-- YouTube input -->
+<div class="input-bar">
+    <input type="text" id="youtubeUrl" placeholder="Paste YouTube Video URL">
+    <button onclick="playVideo()">Play</button>
+</div>
+
+<!-- AI library -->
+<script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+
+
+<!-- Main script -->
+<script>
+// ----------------- LOGIN PROTECTION -----------------
+if (localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "/login";
+}
+
+function logout() {
+    localStorage.removeItem("loggedIn");
+    window.location.href = "/login";
+}
+
+// ----------------- VIDEO PLAY -----------------
+function playVideo() {
+    let url = document.getElementById("youtubeUrl").value;
+    let videoId = "";
+
+    if (url.includes("watch?v=")) {
+        videoId = url.split("watch?v=")[1].split("&")[0];
+    } else if (url.includes("youtu.be/")) {
+        videoId = url.split("youtu.be/")[1].split("?")[0];
+    }
+
+    if (videoId) {
+        document.getElementById("videoFrame").src =
+            "https://www.youtube.com/embed/" + videoId + "?enablejsapi=1";
+    }
+}
+
+// ----------------- WEBCAM -----------------
+let video = document.getElementById("webcam");
+
+async function startWebcam() {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    video.srcObject = stream;
+
+    return new Promise(resolve => {
+        video.onloadedmetadata = () => {
+            video.play();
+            resolve();
+        };
+    });
+}
+
+// ----------------- LOAD FACE MODELS -----------------
+async function loadModels() {
+    const url = "/static/weights";
+    await faceapi.nets.tinyFaceDetector.loadFromUri(url);
+    await faceapi.nets.faceExpressionNet.loadFromUri(url);
+    await faceapi.nets.faceLandmark68Net.loadFromUri(url);
+    console.log("Models loaded");
+}
+
+function pauseVideo() {
+    const iframe = document.getElementById("videoFrame");
+    iframe.contentWindow.postMessage(
+        '{"event":"command","func":"pauseVideo","args":""}',
+        '*'
+    );
+}
+
+function playYouTubeVideo() {
+    const iframe = document.getElementById("videoFrame");
+    iframe.contentWindow.postMessage(
+        '{"event":"command","func":"playVideo","args":""}',
+        '*'
+    );
+}
+let handRaised = false;
+
+const hands = new Hands({
+    locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+    }
+});
+
+hands.setOptions({
+    maxNumHands: 1,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.7
+});
+
+hands.onResults((results) => {
+    if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+        handRaised = true;
+    } else {
+        handRaised = false;
+    }
+});
+
+// ----------------- ATTENTION DETECTION -----------------
+let sleepCounter = 0;
+let noFaceCounter = 0;
+function startDetection() {
+    const statusBox = document.getElementById("statusText");
+
+    setInterval(async () => {
+        if (!video || video.readyState !== 4) {
+            statusBox.innerText = "Status: Camera loading...";
+            return;
+        }
+
+        const detections = await faceapi
+            .detectSingleFace(video, new faceapi.TinyFaceDetectorOptions())
+            .withFaceLandmarks()
+            .withFaceExpressions();
+
+        // ---- NO FACE  ----
+       if (!detections || !detections.landmarks) {
+    noFaceCounter++;
+
+    if (noFaceCounter > 3) {   // waits for a few cycles
+        statusBox.innerText = "Status: No face detected";
+        statusBox.style.color = "white";
+        pauseVideo();
+    }
+
+    return;
+} else {
+    noFaceCounter = 0;  // reset when face is detected
+}
+
+        const exp = detections.expressions;
+        const landmarks = detections.landmarks;
+
+        let status = "Focused";
+
+        // ----- EYE DETECTION -----
+        const leftEye = landmarks.getLeftEye();
+        const rightEye = landmarks.getRightEye();
+
+        function eyeOpen(eye) {
+            const vertical =
+                Math.abs(eye[1].y - eye[5].y) +
+                Math.abs(eye[2].y - eye[4].y);
+            const horizontal = Math.abs(eye[0].x - eye[3].x);
+            return vertical / horizontal;
+        }
+
+        const leftEAR = eyeOpen(leftEye);
+        const rightEAR = eyeOpen(rightEye);
+        const avgEAR = (leftEAR + rightEAR) / 2;
+
+        // ----- SLEEP DETECTION -----
+        if (avgEAR < 0.18) {
+            sleepCounter++;
+        } else {
+            sleepCounter = 0;
+        }
+
+        if (sleepCounter > 3) {
+            status = "Sleeping";
+        }
+
+        // ----- HEAD TURN DETECTION -----
+        const nose = landmarks.getNose()[3];
+        const jaw = landmarks.getJawOutline();
+
+        const leftJaw = jaw[0];
+        const rightJaw = jaw[16];
+
+        const faceCenter = (leftJaw.x + rightJaw.x) / 2;
+        const noseOffset = Math.abs(nose.x - faceCenter);
+
+        if (noseOffset > 25) {
+            status = "Distracted";
+        }
+
+        // ----- YAWNING -----
+        else if (exp.surprised > 0.6) {
+            status = "Yawning";
+        }
+
+        // ----- CONFUSED -----
+        else if (exp.sad > 0.5) {
+            status = "Confused";
+        }
+        // ----- HAND RAISE DOUBT -----
+if (handRaised) {
+    status = "Doubt";
+
+    setTimeout(() => {
+        window.location.href = "/ai"; // your AI page
+    }, 1500);
+}
+
+
+        // ----- COLOR FEEDBACK -----
+        if (status === "Focused") statusBox.style.color = "lime";
+        else if (status === "Confused") statusBox.style.color = "orange";
+        else if (status === "Yawning") statusBox.style.color = "yellow";
+        else if (status === "Sleeping") statusBox.style.color = "red";
+        else if (status === "Distracted") statusBox.style.color = "cyan";
+        else if (status === "Doubt") statusBox.style.color = "violet";
+        else statusBox.style.color = "white";
+
+        statusBox.innerText = "Status: " + status;
+
+        // ----- VIDEO CONTROL -----
+        if (status !== "Focused") {
+            pauseVideo();
+        } else {
+            playYouTubeVideo();
+        }
+
+        console.log("EAR:", avgEAR, "Status:", status);
+
+    }, 2000);
+}
+
+
+// ----------------- START EVERYTHING -----------------
+async function init() {
+    await startWebcam();
+    await loadModels();
+
+    // --- START HAND TRACKING ---
+    const camera = new Camera(video, {
+        onFrame: async () => {
+            await hands.send({ image: video });
+        },
+        width: 640,
+        height: 480
+    });
+    camera.start();
+    // --- END HAND TRACKING ---
+
+    startDetection();
+}
+
+
+init();
+
+</script>
+
+
+</body>
+</html>

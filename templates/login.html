@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="card-bg">
+<div class="card">
+
+<h2>Login</h2>
+
+<input type="text" id="username" placeholder="Username"><br><br>
+<input type="password" id="password" placeholder="Password"><br><br>
+
+<button onclick="login()">Login</button>
+<p><a href="/forget">Forgot Password?</a></p>
+<p>Don't have an account? <a href="/signup">Signup here</a></p>
+
+
+<p id="result"></p>
+
+</div>
+
+<script>
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    fetch("/api/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("Server response:", data);
+
+        // Always show message
+        document.getElementById("result").innerText = data.message;
+
+        // Flexible success check
+        if (data.message.toLowerCase().includes("successful")) {
+            localStorage.setItem("loggedIn", "true");
+            window.location.href = "/dashboard";
+        }
+    })
+    .catch(err => {
+        console.error("Login error:", err);
+    });
+}
+</script>
+
+
+</body>
+</html>
